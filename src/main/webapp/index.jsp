@@ -33,10 +33,8 @@ const myFunction = () =>
 		if (empt1 == "" || empt2=="" || empt3=="" || empt4=="")
 		{
 		alert("Prosze wprowadzic liczby do pol");
-		
-		
 		}
-		else 
+		else
 		{
 			document.forms["form1"].submit();
 			

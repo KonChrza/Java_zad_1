@@ -1,14 +1,25 @@
 package servlets;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
 
 @WebServlet("/credit_calc_serv")
@@ -41,8 +52,9 @@ public class credit_calc_serv extends HttpServlet {
 		String isInstallmentLower = request.getParameter("isInstallmentLower");
 			DecimalFormat df = new DecimalFormat("#.##");
 			
-			response.getWriter().println("<table class=\"table\">");
-			response.getWriter().println( "<tr>");
+			response.getWriter().println("<div id=\"divTable\">");
+			response.getWriter().println("<table class=\"table\" id=\"table\">");
+			response.getWriter().println( "<tr style = 'background:#ccc'>");
 			response.getWriter().println( "<th>" + " Nr raty " +" </th>");
 			response.getWriter().println( "<th>" + " Kwota Kapitalu " +" </th>");
 			response.getWriter().println( "<th>" + " Kwota Odsetek " +" </th>");
@@ -56,7 +68,7 @@ public class credit_calc_serv extends HttpServlet {
 			for (int i = 1; i<=listOfInstalments.size();i++){
 			
 			
-			response.getWriter().println( "<tr>");
+			response.getWriter().println( "<tr style = 'background:#ccc'>");
 			response.getWriter().println( "<td>" + i +" </td>");
 			response.getWriter().println( "<td>" + df.format(listOfInstalments.get(i-1).getCredit()) +" </td>");
 			response.getWriter().println( "<td>" + df.format(listOfInstalments.get(i-1).getIntrest()) +" </td>");
@@ -72,7 +84,7 @@ public class credit_calc_serv extends HttpServlet {
 			ArrayList<Instalment> listOfInstalments = intrestsAreLower(amoutOfCredit, instalments, intrest, flatPayment);
 			for (int i = 1; i<=listOfInstalments.size();i++){
 				
-				response.getWriter().println( "<tr>");
+				response.getWriter().println( "<tr style = 'background:#ccc'>");
 				response.getWriter().println( "<td>" + i +" </td>");
 				response.getWriter().println( "<td>" + df.format(listOfInstalments.get(i-1).getCredit()) +" </td>");
 				response.getWriter().println( "<td>" + df.format(listOfInstalments.get(i-1).getIntrest()) +" </td>");
@@ -81,9 +93,39 @@ public class credit_calc_serv extends HttpServlet {
 				response.getWriter().println( "</tr>");
 				}
 		}
-		
-			response.getWriter().println("</table>");
-		
+				response.getWriter().println("</table>");
+				response.getWriter().println("</div>");
+				response.getWriter().println("<script src=\"https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js\"></script>" + 
+											"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js\"></script>" + 
+											"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js\"></script>");
+				
+				response.getWriter().println("<script>"
+						+ " function toPDF() {" + 
+						"    var pdf = new jsPDF('p', 'pt', 'letter');" + 
+						"    source = $('#divTable')[0];" + 
+						"    specialElementHandlers = {" + 
+						"        '#bypassme': function (element, renderer) {" + 
+						"            return true" + 
+						"        }" + 
+						"    };" + 
+						"    margins = {" + 
+						"        top: 80," + 
+						"        bottom: 60," + 
+						"        left: 40," + 
+						"        width: 522" + 
+						"    };" + 
+						"    pdf.fromHTML(" + 
+						"    source," + 
+						"    margins.left, " + 
+						"    margins.top, { " + 
+						"        'width': margins.width, " + 
+						"        'elementHandlers': specialElementHandlers" + 
+						"    }," +  
+						"    function (dispose) {" + 
+						"        pdf.save('Test.pdf');" + 
+						"    }, margins);" + 
+						"}</script>");
+				response.getWriter().println("<button onclick=\"javascript:toPDF()\">esportuj do PDF</button>");
 	}
 	
 	private static boolean isNotNumeric(String str) { 
@@ -92,6 +134,17 @@ public class credit_calc_serv extends HttpServlet {
 		if (str == null) return false;
 		try {  
 		    Double.parseDouble(str);  
+		    return false;
+		  } catch(NumberFormatException e){  
+		    return true;  
+		  }  
+		}
+	private static boolean isNotNumericInt(String str) { 
+		if (str.isEmpty()) return false;
+		if (str == "") return false;
+		if (str == null) return false;
+		try {  
+			Integer.parseInt(str); 
 		    return false;
 		  } catch(NumberFormatException e){  
 		    return true;  
@@ -126,4 +179,6 @@ public class credit_calc_serv extends HttpServlet {
 		
 		return listOfInstalments;
 	}
+	
 }
+	
