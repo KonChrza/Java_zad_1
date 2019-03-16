@@ -88,6 +88,7 @@ public class credit_calc_serv extends HttpServlet {
 	
 	private static boolean isNotNumeric(String str) { 
 		if (str.isEmpty()) return false;
+		if (str == "") return false;
 		if (str == null) return false;
 		try {  
 		    Double.parseDouble(str);  
