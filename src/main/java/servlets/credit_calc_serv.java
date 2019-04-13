@@ -1,4 +1,4 @@
-package servlets;
+ package servlets;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -37,9 +37,9 @@ public class credit_calc_serv extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if (isNotNumeric(request.getParameter("creditValue")) &&  //sprawdzenie czy podane wartosci to liczby
-				isNotNumeric(request.getParameter("numberOfInstallments")) && 
-					isNotNumeric(request.getParameter("intrest")) && 
+		if (isNotNumeric(request.getParameter("creditValue")) ||  //sprawdzenie czy podane wartosci to liczby
+				isNotNumeric(request.getParameter("numberOfInstallments")) || 
+					isNotNumeric(request.getParameter("intrest")) || 
 						isNotNumeric(request.getParameter("flatPayment"))) 
 				{
 					response.sendRedirect("/ErrorPage.jsp");
